@@ -8,7 +8,6 @@ import hashlib
 import getpass
 
 def generated_random_password(length):
-
     # Concatenates all the ASCII values into one string
     passwordValues = string.ascii_letters
     passwordValues += string.digits
@@ -33,8 +32,9 @@ def display_entry():
             # Keeps track of how many passwords have been generated 
             # strip() method removes any leading, and trailing whitespaces
             for i, entry in enumerate(entries):
-                print(f"{i + 1}: {entry.strip()}")
+                print(f"{i + 1}) {entry.strip()}")
     else:
+        # Txt file does not exist (or path is wrong)
         print("No entries")
 
 
