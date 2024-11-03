@@ -7,6 +7,9 @@ import os
 import hashlib
 import getpass
 
+# Encryption
+from cryptography.fernet import Fernet
+
 def generated_random_password(length):
     # Concatenates all the ASCII values into one string
     passwordValues = string.ascii_letters
@@ -56,8 +59,18 @@ def delete_entry(entry_number):
     else:
         print("No entry found")
 
+def generate_key():
+    key = Fernet.generate_key()
+    return key
+    print(key)
+
 def main():
     while True:
+        key = Fernet.generate_key()
+        print(key)
+        print(key)
+        print(key)
+
         print("\nMenu:")
         print("1. Generate new password")
         print("2. Display current password entries")
