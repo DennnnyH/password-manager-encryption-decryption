@@ -26,16 +26,36 @@ def generated_random_password(length):
     return generated_password
 
 def display_entry():
+
+
+    key = generate_key()
+
+
     # Checks operating system to see if the file exists
     if os.path.exists("password.txt"):
         # Opens the txt file with intentions to read ('r')
         with open ('password.txt','r') as file:
             entries = file.readlines()
             print("\nCurrent Password Entries: ")
+
+
+
+
+
+            fernet = Fernet(key)
             # Keeps track of how many passwords have been generated 
             # strip() method removes any leading, and trailing whitespaces
             for i, entry in enumerate(entries):
-                print(f"{i + 1}) {entry.strip()}")
+                try:
+                    # Decrypt each entry and decode it to a string
+                    decrypted_entry = fernet.decrypt(entry).decode('utf-8')
+                    print(f"{i + 1}) {decrypted_entry.strip()}")
+                except Exception as e:
+                    print(f"Error decrypting entry {i + 1}: {e}")
+            
+
+
+                # print(f"{i + 1}) {entry.strip()}")
     else:
         # Txt file does not exist (or path is wrong)
         print("No entries")
@@ -47,12 +67,26 @@ def delete_entry(entry_number):
             entries = file.readlines()
         # Checks if the entry that wants to be deleted is between the beginning and end
         if 1 <= entry_number <= len(entries):
+
+            fernet = Fernet(generate_key())
+            decrypted_entry = fernet.decrypt(entries[entry_number - 1]).decode('utf-8')
+            print(f"Deleted entry: {decrypted_entry.strip()}")
+            
             # Removes the specific entry
             del entries[entry_number - 1]
-            # Open txt file with intention to write ('w')
-            with open('password.txt','w') as file:
+            # Open txt file with intention to write in binary ('wb')
+            # Originally was 'w'
+            with open('password.txt','wb') as file:
+
+
+
+                for entry in entries:
+                    file.write(entry) 
+
+
+
                 # Writes the remaining entries back
-                file.writelines(entries)
+                # ile.writelines(entries)
             print("Entry deleted")
         else:
             print("Invalid entry number")
@@ -155,6 +189,9 @@ def main():
             # Formats how the passwords will get stored in the txt file
             entry = f"Password : {password} || Purpose: {purpose}\n"
 
+
+
+
             # Encrypt the new entry before writing it to the file
             fernet = Fernet(key)
             encrypted_entry = fernet.encrypt(entry.encode())
@@ -164,6 +201,9 @@ def main():
                 file.write(encrypted_entry)
     
             print("Encrypted password and purpose saved to passwords.txt.")
+
+
+
 
             # Formats how the passwords will get stored in the txt file
             # entry = f"Password : {password} || Purpose: {purpose}\n"
