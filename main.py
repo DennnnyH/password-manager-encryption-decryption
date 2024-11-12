@@ -26,36 +26,16 @@ def generated_random_password(length):
     return generated_password
 
 def display_entry():
-
-
-    key = generate_key()
-
-
     # Checks operating system to see if the file exists
     if os.path.exists("password.txt"):
         # Opens the txt file with intentions to read ('r')
         with open ('password.txt','r') as file:
             entries = file.readlines()
             print("\nCurrent Password Entries: ")
-
-
-
-
-
-            fernet = Fernet(key)
             # Keeps track of how many passwords have been generated 
             # strip() method removes any leading, and trailing whitespaces
             for i, entry in enumerate(entries):
-                try:
-                    # Decrypt each entry and decode it to a string
-                    decrypted_entry = fernet.decrypt(entry).decode('utf-8')
-                    print(f"{i + 1}) {decrypted_entry.strip()}")
-                except Exception as e:
-                    print(f"Error decrypting entry {i + 1}: {e}")
-            
-
-
-                # print(f"{i + 1}) {entry.strip()}")
+                print(f"{i + 1}) {entry.strip()}")
     else:
         # Txt file does not exist (or path is wrong)
         print("No entries")
@@ -67,26 +47,12 @@ def delete_entry(entry_number):
             entries = file.readlines()
         # Checks if the entry that wants to be deleted is between the beginning and end
         if 1 <= entry_number <= len(entries):
-
-            fernet = Fernet(generate_key())
-            decrypted_entry = fernet.decrypt(entries[entry_number - 1]).decode('utf-8')
-            print(f"Deleted entry: {decrypted_entry.strip()}")
-            
             # Removes the specific entry
             del entries[entry_number - 1]
-            # Open txt file with intention to write in binary ('wb')
-            # Originally was 'w'
-            with open('password.txt','wb') as file:
-
-
-
-                for entry in entries:
-                    file.write(entry) 
-
-
-
+            # Open txt file with intention to write ('w')
+            with open('password.txt','w') as file:
                 # Writes the remaining entries back
-                # ile.writelines(entries)
+                file.writelines(entries)
             print("Entry deleted")
         else:
             print("Invalid entry number")
@@ -164,7 +130,7 @@ def decryption():
 
 # Need to test encryption and decryption
 def main():
-    key = generate_key() 
+    # encryption()
     while True:
         print("\nMenu:")
         print("1. Generate new password")
@@ -185,38 +151,18 @@ def main():
             purpose = input("What is this password for? ")
             purpose = purpose.strip()
 
-
             # Formats how the passwords will get stored in the txt file
             entry = f"Password : {password} || Purpose: {purpose}\n"
 
-
-
-
-            # Encrypt the new entry before writing it to the file
-            fernet = Fernet(key)
-            encrypted_entry = fernet.encrypt(entry.encode())
-
-            # Adds the encrypted entry to the password.txt file
-            with open('password.txt', 'ab') as file:  # 'ab' for append binary mode
-                file.write(encrypted_entry)
-    
-            print("Encrypted password and purpose saved to passwords.txt.")
-
-
-
-
-            # Formats how the passwords will get stored in the txt file
-            # entry = f"Password : {password} || Purpose: {purpose}\n"
-
             # Adds the password to the password.txt file
             # with open(file_path, mode, encoding) as file: SYNTAX
-            # with open('password.txt', 'a') as file:
-                # file.write(entry)
+            with open('password.txt', 'a') as file:
+                file.write(entry)
     
-            # print("Password and purpose saved to passwords.txt.")
+            print("Password and purpose saved to passwords.txt.")
 
         elif choice == '2':
-            decryption()
+            # decryption()
             display_entry()
 
         elif choice == '3':
