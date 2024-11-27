@@ -25,9 +25,17 @@ def generated_random_password(length):
 
     return generated_password
 
+decrypted = False
+
 def display_entry():
+    # global decrypted
     # Checks operating system to see if the file exists
     if os.path.exists("password.txt"):
+        # if not decrypted:
+            # Decrypt before displaying entries
+            # decryption()
+            # decrypted = True
+
         # Opens the txt file with intentions to read ('r')
         with open ('password.txt','r') as file:
             entries = file.readlines()
@@ -42,7 +50,13 @@ def display_entry():
 
 
 def delete_entry(entry_number):
+    # global decrypted
     if os.path.exists("password.txt"):
+        # if not decrypted:
+            # Decrypt before deleting entries
+            # decryption()
+            # decrypted = True
+
         with open('password.txt','r') as file:
             entries = file.readlines()
         # Checks if the entry that wants to be deleted is between the beginning and end
@@ -96,41 +110,79 @@ def encryption():
     return key
 
 def decryption():
-     password = getpass.getpass("Enter password to access file decryption: ")
+    while True: 
+        password = getpass.getpass("Enter password to access file decryption: ")
+        if password == "123456":
+            print("Access given")
 
-     if password == "123456":
-        print("Access given")
+            if os.path.exists("password.txt"):
+                with open('password.txt','rb') as file:
+                    file_content = file.read()
 
-        if os.path.exists("password.txt"):
-            with open('password.txt','rb') as file:
-                file_content = file.read()
+                key = generate_key()
+                fernet = Fernet(key)
+                # Test a block of code for errors
+                try:
+                    decrypted_content = fernet.decrypt(file_content)
 
-            key = generate_key()
-            fernet = Fernet(key)
-            # Test a block of code for errors
-            try:
-                decrypted_content = fernet.decrypt(file_content)
+                    # Decodes the original file to text
+                    decrypted_text = decrypted_content.decode('utf-8')
 
-                # Decodes the original file to text
-                decrypted_text = decrypted_content.decode('utf-8')
+                    # Remove any unwanted blank lines from the beginning or end of the content
+                    # decrypted_text = '\n'.join(line.strip() for line in decrypted_text.splitlines() if line.strip())
 
-                # Prints the decrypted text, NOT overriding
-                print(f"Decrypted content: {decrypted_text}")
+                    # Prints the decrypted text, NOT overriding
+                    # print(f"Decrypted content: {decrypted_text}")
 
-                # 'b' means to write in text mode
-                with open("password.txt", 'w') as file:
-                    file.write(decrypted_text)
-                print("File decrypted")
-            except Exception as e:
-                print("Decryption failed", str(e))
+                    # 'b' means to write in text mode
+                    with open("password.txt", 'w') as file:
+                        file.write(decrypted_text)
+                    print("File decrypted")
+                    return
+                except Exception as e:
+                    print("Decryption failed", str(e))
+                    return
+            else:
+                print("File doesn't exist")
+                return
         else:
-            print("File doesn't exist")
-     else:
-         print("Wrong password")
+            print("Wrong password")
+
+def remove_empty_entries():
+    # Check if the password.txt file exists
+    if os.path.exists('password.txt'):
+        with open('password.txt', 'r') as file:
+            entries = file.readlines()
+        
+        # Remove any empty entries (lines that are just whitespace)
+        #
+        #
+        cleaned_entries = [entry for entry in entries if entry.strip() != '']
+        
+        # Write the cleaned entries back to the file
+        with open('password.txt', 'w') as file:
+            file.writelines(cleaned_entries)
+        print("Empty entries removed.")
+    else:
+        print("password.txt does not exist.")
+
+def get_valid_length():
+    while True:
+        try:
+            length = int(input("Enter password length: "))
+            return length
+        except ValueError:
+            print("Invalid input. Please enter a valid number for the password length.")
 
 # Need to test encryption and decryption
 def main():
-    # encryption()
+    global decrypted
+    print("Decrypt first: ")
+    decryption()
+
+    # Remove any empty entries before proceeding
+    remove_empty_entries()
+
     while True:
         print("\nMenu:")
         print("1. Generate new password")
@@ -142,8 +194,8 @@ def main():
 
         if choice == '1':
             # Ask user for password length
-            length = int(input("Enter password length: "))
-
+            length = get_valid_length()
+    
             # Generates password and stores it into a var in memory
             password = generated_random_password(length)
 
@@ -151,18 +203,20 @@ def main():
             purpose = input("What is this password for? ")
             purpose = purpose.strip()
 
-            # Formats how the passwords will get stored in the txt file
+            # Formats how the passwords will get stored in the txt file1
             entry = f"Password : {password} || Purpose: {purpose}\n"
 
             # Adds the password to the password.txt file
             # with open(file_path, mode, encoding) as file: SYNTAX
+            print(f"Writing entry: {entry}")
             with open('password.txt', 'a') as file:
                 file.write(entry)
     
             print("Password and purpose saved to passwords.txt.")
 
+            # decrypted = False
+
         elif choice == '2':
-            # decryption()
             display_entry()
 
         elif choice == '3':
@@ -170,6 +224,7 @@ def main():
             entry_number = int(input("Enter entry you want to delete: "))
             delete_entry(entry_number)
         elif choice == '4':
+            encryption()
             break
 
         else:
@@ -177,3 +232,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TO DO:
+# 1) Check for extra blank lines before writing a new entry
+# 2) If user doesn't input a valid length, prompt the user to try again, don't force close
