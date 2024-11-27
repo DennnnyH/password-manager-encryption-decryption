@@ -25,16 +25,9 @@ def generated_random_password(length):
 
     return generated_password
 
-decrypted = False
-
 def display_entry():
-    # global decrypted
     # Checks operating system to see if the file exists
     if os.path.exists("password.txt"):
-        # if not decrypted:
-            # Decrypt before displaying entries
-            # decryption()
-            # decrypted = True
 
         # Opens the txt file with intentions to read ('r')
         with open ('password.txt','r') as file:
@@ -50,12 +43,7 @@ def display_entry():
 
 
 def delete_entry(entry_number):
-    # global decrypted
     if os.path.exists("password.txt"):
-        # if not decrypted:
-            # Decrypt before deleting entries
-            # decryption()
-            # decrypted = True
 
         with open('password.txt','r') as file:
             entries = file.readlines()
@@ -128,12 +116,6 @@ def decryption():
                     # Decodes the original file to text
                     decrypted_text = decrypted_content.decode('utf-8')
 
-                    # Remove any unwanted blank lines from the beginning or end of the content
-                    # decrypted_text = '\n'.join(line.strip() for line in decrypted_text.splitlines() if line.strip())
-
-                    # Prints the decrypted text, NOT overriding
-                    # print(f"Decrypted content: {decrypted_text}")
-
                     # 'b' means to write in text mode
                     with open("password.txt", 'w') as file:
                         file.write(decrypted_text)
@@ -168,15 +150,14 @@ def remove_empty_entries():
 
 def get_valid_length():
     while True:
+        # Checks for valid length, if not valid, try again
         try:
             length = int(input("Enter password length: "))
             return length
         except ValueError:
             print("Invalid input. Please enter a valid number for the password length.")
 
-# Need to test encryption and decryption
 def main():
-    global decrypted
     print("Decrypt first: ")
     decryption()
 
@@ -214,8 +195,6 @@ def main():
     
             print("Password and purpose saved to passwords.txt.")
 
-            # decrypted = False
-
         elif choice == '2':
             display_entry()
 
@@ -234,5 +213,3 @@ if __name__ == "__main__":
     main()
 
 # TO DO:
-# 1) Check for extra blank lines before writing a new entry
-# 2) If user doesn't input a valid length, prompt the user to try again, don't force close
