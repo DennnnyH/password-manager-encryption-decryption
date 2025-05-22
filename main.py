@@ -34,6 +34,7 @@ def display_entry():
             # strip() method removes any leading, and trailing whitespaces
             for i, entry in enumerate(entries):
                 print(f"{i + 1}: {entry.strip()}")
+            file.close()
     else:
         print("No entries")
 
@@ -47,9 +48,10 @@ def delete_entry(entry_number):
             # Removes the specific entry
             del entries[entry_number - 1]
             # Open txt file with intention to write ('w')
-            with open('password.txt','w'):
+            with open('password.txt','w') as file:
                 # Writes the remaining entries back
                 file.writelines(entries)
+                file.close()
             print("Entry deleted")
         else:
             print("Invalid entry number")
